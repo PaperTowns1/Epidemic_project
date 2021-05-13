@@ -26,7 +26,6 @@ int main() {
   std::cout << "Gamma: ";
   double g;
   std::cin >> g;
-
   State initial_state{s, i, r};
   Virus Covid{initial_state, days};
 
@@ -51,6 +50,8 @@ int main() {
 
   window.clear(sf::Color::White);
   display.draw_axes();
+  display.draw_axes_values(days, data);
+  display.draw_label();
 
   display.draw_susceptible(data);
   display.draw_infectious(data);

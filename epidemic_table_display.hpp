@@ -13,7 +13,11 @@ class Display {
 
  public:
   Display(sf::RenderWindow& window, int display_size)
-      : m_window{window}, m_display_size{display_size} {}
+      : m_window{window}, m_display_size{display_size} {
+    if (!m_font.loadFromFile("ZenDots-Regular.ttf")) {
+      throw std::runtime_error{"cannot load font"};
+    }
+  }
 
   void draw_axes() {
     // line x-axis
@@ -65,6 +69,128 @@ class Display {
     }
 
     m_window.draw(y_axis_notches);
+
+    // name x_axis
+    sf::Text x_axis_name;
+
+    x_axis_name.setFont(m_font);
+    x_axis_name.setString("Days");
+
+    x_axis_name.setCharacterSize(15);
+    x_axis_name.setFillColor(sf::Color::Black);
+
+    x_axis_name.setPosition(sf::Vector2f(520, 490));
+
+    m_window.draw(x_axis_name);
+
+    // name y_axis
+    sf::Text y_axis_name;
+
+    y_axis_name.setFont(m_font);
+    y_axis_name.setString("Population");
+
+    y_axis_name.setCharacterSize(15);
+    y_axis_name.setFillColor(sf::Color::Black);
+
+    y_axis_name.setPosition(sf::Vector2f(50, 65));
+
+    m_window.draw(y_axis_name);
+  }
+
+  void draw_axes_values(double days, std::vector<State> const& data) {
+    // values x_axis
+    for (int i = 0; i != 10; ++i) {
+      sf::Text value;
+      value.setFont(m_font);
+      std::string s;
+      int a = days / 10 * (i + 1);
+      s = std::to_string(a);
+      value.setString(s);
+      value.setCharacterSize(10);
+      value.setFillColor(sf::Color::Black);
+      value.setPosition(sf::Vector2f(40 * i + 125, 510));
+      m_window.draw(value);
+    }
+
+    // values y_axis
+    for (int i = 0; i != 10; ++i) {
+      sf::Text value;
+      value.setFont(m_font);
+      std::string s;
+      int a = data[0].s / 10 * (10 - i);
+      s = std::to_string(a);
+      value.setString(s);
+      value.setCharacterSize(10);
+      value.setFillColor(sf::Color::Black);
+      value.setPosition(sf::Vector2f(55, 40 * i + 95));
+      m_window.draw(value);
+    }
+  }
+
+  void draw_label() {
+    // label
+    sf::VertexArray label(sf::LineStrip, 5);
+
+    label[0].position = sf::Vector2f(350, 20);
+    label[1].position = sf::Vector2f(550, 20);
+    label[2].position = sf::Vector2f(550, 95);
+    label[3].position = sf::Vector2f(350, 95);
+    label[4].position = sf::Vector2f(350, 20);
+
+    label[0].color = sf::Color::Black;
+    label[1].color = sf::Color::Black;
+    label[2].color = sf::Color::Black;
+    label[3].color = sf::Color::Black;
+    label[4].color = sf::Color::Black;
+
+    m_window.draw(label);
+
+    // names label
+    sf::Text susceptible, infectious, recovered;
+
+    susceptible.setFont(m_font);
+    infectious.setFont(m_font);
+    recovered.setFont(m_font);
+
+    susceptible.setString("Susceptible");
+    infectious.setString("Infectious");
+    recovered.setString("Recovered");
+
+    susceptible.setCharacterSize(15);
+    infectious.setCharacterSize(15);
+    recovered.setCharacterSize(15);
+    susceptible.setFillColor(sf::Color::Black);
+    infectious.setFillColor(sf::Color::Black);
+    recovered.setFillColor(sf::Color::Black);
+
+    susceptible.setPosition(sf::Vector2f(355, 25));
+    infectious.setPosition(sf::Vector2f(355, 50));
+    recovered.setPosition(sf::Vector2f(355, 75));
+
+    m_window.draw(susceptible);
+    m_window.draw(infectious);
+    m_window.draw(recovered);
+
+    //color lines label
+    sf::VertexArray color(sf::Lines, 6);
+
+    color[0].position = sf::Vector2f(485, 35);
+    color[1].position = sf::Vector2f(525, 35);
+    color[2].position = sf::Vector2f(485, 60);
+    color[3].position = sf::Vector2f(525, 60);
+    color[4].position = sf::Vector2f(485, 85);
+    color[5].position = sf::Vector2f(525, 85);
+
+
+    color[0].color = sf::Color::Blue;
+    color[1].color = sf::Color::Blue;
+    color[2].color = sf::Color::Red;
+    color[3].color = sf::Color::Red;
+    color[4].color = sf::Color::Green;
+    color[5].color = sf::Color::Green;
+
+    m_window.draw(color);
+
   }
 
   void draw_susceptible(std::vector<State> const& data) {

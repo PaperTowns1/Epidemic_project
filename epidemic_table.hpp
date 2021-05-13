@@ -4,7 +4,6 @@
 #include <cassert>
 #include <vector>
 
-
 struct State {
   double s;
   double i;
