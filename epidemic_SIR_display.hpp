@@ -124,7 +124,7 @@ class Display {
 
     // set position y-axis name
     y_axis_name.setPosition(
-        sf::Vector2f(m_display_size * 0.15, m_display_size * 0.15));
+        sf::Vector2f(m_display_size * 0.06, m_display_size * 0.15));
 
     // draw y-axis name
     m_window.draw(y_axis_name);
@@ -161,7 +161,7 @@ class Display {
       sf::Text y_axis_value;
       y_axis_value.setFont(m_font);
 
-      int a = data[0].s / 10 * (10 - i);
+      long int a = data[0].s / 10 * (10 - i);
 
       int b = count_digits(a) - 1;
 
@@ -233,11 +233,11 @@ class Display {
 
     // set position legend names
     susceptible.setPosition(
-        sf::Vector2f(m_display_size * 0.57, m_display_size * 0.05));
+        sf::Vector2f(m_display_size * 0.57, m_display_size * 0.055));
     infectious.setPosition(
         sf::Vector2f(m_display_size * 0.57, m_display_size * 0.085));
     recovered.setPosition(
-        sf::Vector2f(m_display_size * 0.57, m_display_size * 0.12));
+        sf::Vector2f(m_display_size * 0.57, m_display_size * 0.115));
 
     // draw legend names
     m_window.draw(susceptible);
@@ -249,17 +249,17 @@ class Display {
 
     // set position legend color lines
     color[0].position =
-        sf::Vector2f(m_display_size * 0.6, m_display_size * 0.065);
+        sf::Vector2f(m_display_size * 0.6, m_display_size * 0.066);
     color[1].position =
-        sf::Vector2f(m_display_size * 0.7, m_display_size * 0.065);
+        sf::Vector2f(m_display_size * 0.7, m_display_size * 0.066);
     color[2].position =
         sf::Vector2f(m_display_size * 0.6, m_display_size * 0.10);
     color[3].position =
         sf::Vector2f(m_display_size * 0.7, m_display_size * 0.10);
     color[4].position =
-        sf::Vector2f(m_display_size * 0.6, m_display_size * 0.135);
+        sf::Vector2f(m_display_size * 0.6, m_display_size * 0.134);
     color[5].position =
-        sf::Vector2f(m_display_size * 0.7, m_display_size * 0.135);
+        sf::Vector2f(m_display_size * 0.7, m_display_size * 0.134);
 
     // color legend color lines
     color[0].color = sf::Color::Blue;
@@ -273,7 +273,7 @@ class Display {
     m_window.draw(color);
   }
 
-  int count_digits(int n) {
+  int count_digits(long int n) {
     int num = 0;
     while (n != 0) {
       n = n / 10;
