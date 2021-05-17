@@ -1,9 +1,9 @@
 #include <iostream>
 
-#include "epidemic_table_display.hpp"
+#include "epidemic_SIR_display.hpp"
 
 int main() {
-  std::cout << "S: ";
+  /*std::cout << "S: ";
   double s;
   std::cin >> s;
 
@@ -25,33 +25,29 @@ int main() {
 
   std::cout << "Gamma: ";
   double g;
-  std::cin >> g;
+  std::cin >> g;*/
+
+  double s = 99997, i = 3, r = 0, b = 0.4, g = 0.04, days = 100;
+
   State initial_state{s, i, r};
   Virus Covid{initial_state, days};
 
   std::vector<State> data = Covid.evolve(b, g);
 
-  std::cout << "S"
-            << "\t"
-            << "I"
-            << "\t"
-            << "R"
-            << "\t"
-            << "N" << '\n';
-  for (auto first = data.begin(), last = data.end(); first != last; ++first) {
+  //std::cout << "S\tI\tR\tN\n";
+
+  /*for (auto first = data.begin(), last = data.end(); first != last; ++first) {
     std::cout << first->s << "\t" << first->i << "\t" << first->r << '\t'
               << first->s + first->i + first->r << std::endl;
-  }
+  }*/
 
   auto const display_size{600};
 
-  sf::RenderWindow window(sf::VideoMode(display_size, display_size), "Virus");
+  sf::RenderWindow window(sf::VideoMode(display_size, display_size), "SIR");
   Display display{window, display_size};
 
   window.clear(sf::Color::White);
-  display.draw_axes();
-  display.draw_axes_values(days, data);
-  display.draw_label();
+  display.draw_canvas(days, data);
 
   display.draw_susceptible(data);
   display.draw_infectious(data);

@@ -1,5 +1,5 @@
-#ifndef EPIDEMIC_TABLE_HPP
-#define EPIDEMIC_TABLE_HPP
+#ifndef EPIDEMIC_SIR_HPP
+#define EPIDEMIC_SIR_HPP
 
 #include <cassert>
 #include <vector>
