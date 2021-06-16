@@ -22,22 +22,30 @@ class Display_graph {
     }
   }
 
-  void draw_canvas();
+  void draw_axes();
 
-  void draw_more(std::vector<Population> const& data);
+  void draw_axes_notches();
 
-  int count_digits(long int n);
+  void draw_axes_values(std::vector<Population> const& data);
+
+  void draw_legend();
+
+  int count_digits(int n);
 
   sf::Transform transform();
 
   void draw_susceptible(std::vector<Population> const& data);
 
+  void draw_legend_susceptible();
+
   void draw_infectious(std::vector<Population> const& data);
 
+  void draw_legend_infectious();
+
   void draw_recovered(std::vector<Population> const& data);
+
+  void draw_legend_recovered();
 };
-
-
 
 }  // namespace epidemic_SIR
 

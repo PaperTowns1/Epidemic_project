@@ -37,16 +37,14 @@ class Virus {
   void add_data(Population const& data_to_add);
 };
 
-Population input_initial_population();
-
-Parameter input_parameter();
-
 Virus evolve(Virus const& virus_to_evolve, Parameter const& parameter,
              double duration);
 
-std::vector<Population> round(std::vector<Population> const& data_to_round);
-
 void print(Virus const& virus_to_print, Parameter const& parameter);
+
+std::vector<Population> round_off(std::vector<Population> const& data_to_round_off);
+
+void print_round_off(Virus const& virus_to_print, Parameter const& parameter);
 
 }  // namespace epidemic_SIR
 

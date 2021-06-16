@@ -7,7 +7,6 @@
 
 #include "SIR_automa.hpp"
 
-
 namespace epidemic_SIR {
 
 class Display_automa {

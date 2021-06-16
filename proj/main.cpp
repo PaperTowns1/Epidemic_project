@@ -1,78 +1,13 @@
 #include "SIR.hpp"
+#include "SIR_display.hpp"
 #include "SIR_automa.hpp"
 #include "SIR_automa_display.hpp"
-#include "SIR_display.hpp"
-
-int input_choice(int inf, int sup) {
-  int choice;
-
-  std::cout << "Choice: ";
-  std::cin >> choice;
-  std::cout << '\n';
-
-  while (choice < inf || choice > sup) {
-    std::cout << "Invalid choice, try again " << '\n';
-    std::cout << "Choice: ";
-    std::cin >> choice;
-    std::cout << '\n';
-  }
-
-  return choice;
-}
-
-int input_days() {
-  int days;
-
-  std::cout << "Days: ";
-  std::cin >> days;
-  std::cout << '\n';
-
-  if (days < 0) {
-    throw std::range_error{"Days are less than 0"};
-  }
-
-  return days;
-}
-
-void plot_graph(int choice_3, int choice_4, int choice_5,
-                std::vector<epidemic_SIR::Population> const& data_to_draw) {
-  std::vector<epidemic_SIR::Population> data = data_to_draw;
-  auto const display_size = 600;
-
-  sf::RenderWindow window(sf::VideoMode(display_size, display_size),
-                          "SIR model");
-
-  epidemic_SIR::Display_graph display{window, display_size};
-
-  window.clear(sf::Color::White);
-
-  display.draw_canvas();
-  display.draw_more(data);
-
-  if (choice_3 == 1) {
-    display.draw_susceptible(data);
-  }
-
-  if (choice_4 == 1) {
-    display.draw_infectious(data);
-  }
-
-  if (choice_5 == 1) {
-    display.draw_recovered(data);
-  }
-
-  window.display();
-
-  sf::Event event;
-  while (window.waitEvent(event)) {
-    if (event.type == sf::Event::Closed) window.close();
-  }
-}
+#include "input.hpp"
 
 int main() {
-  std::cout << "Which epidemiological model?" << '\n'
+  std::cout << "Hi, which epidemiological model?" << '\n'
             << "1. SIR model (differential equations)" << '\n'
-            << "2. SIR model (automa)" << '\n';
+            << "2. SIR model (cellular automata)" << '\n';
 
   int choice_1 = input_choice(1, 2);
 
@@ -84,22 +19,29 @@ int main() {
 
       epidemic_SIR::Virus covid{initial_population};
 
-      int days = input_days();
+      int choice_2;
 
       do {
-        covid = epidemic_SIR::evolve(covid, parameter, days);
+        int days = input_days();
 
-        int choice_2;
+        covid = epidemic_SIR::evolve(covid, parameter, days);
+        std::vector<epidemic_SIR::Population> data = covid.get_data();
+
+        int choice_3;
 
         do {
-          std::cout << "What output?" << '\n'
-                    << "1. Table with values (standard output)" << '\n'
-                    << "2. Graph" << '\n'
+          std::cout << "Which output?" << '\n'
+                    << "1. Table with values (standard output - double type)"
+                    << '\n'
+                    << "2. Table with approximate values (standard output - "
+                       "int type)"
+                    << '\n'
+                    << "3. Graph" << '\n'
                     << "0. Exit" << '\n';
 
-          choice_2 = input_choice(0, 2);
+          choice_3 = input_choice(0, 3);
 
-          switch (choice_2) {
+          switch (choice_3) {
             case 0: {
             } break;
 
@@ -108,35 +50,72 @@ int main() {
             } break;
 
             case 2: {
-              std::vector<epidemic_SIR::Population> data = covid.get_data();
-              std::cout << "Do you want susceptible (S) on your graph? (0 for "
-                           "no and 1 for yes)"
-                        << '\n';
-              int choice_3 = input_choice(0, 1);
-
-              std::cout << "Do you want infectious (I) on your graph? (0 for "
-                           "no and 1 for yes)"
-                        << '\n';
-              int choice_4 = input_choice(0, 1);
-
-              std::cout << "Do you want recovered (R) on your graph? (0 for no "
-                           "and 1 for yes)"
-                        << '\n';
-              int choice_5 = input_choice(0, 1);
-
-              plot_graph(choice_3, choice_4, choice_5, data);
-
+              epidemic_SIR::print_round_off(covid, parameter);
             } break;
 
-              std::cout << '\n';
+            case 3: {
+              std::cout << "Which graph?" << '\n'
+                        << "1. Graph with S" << '\n'
+                        << "2. Graph with I" << '\n'
+                        << "3. Graph with R" << '\n'
+                        << "5. Graph with S, I" << '\n'
+                        << "6. Graph with I, R" << '\n'
+                        << "7. Graph with S, R" << '\n'
+                        << "8. Graph with S, I, R" << '\n';
+
+              int choice_4 = input_choice(1, 8);
+
+              auto const display_size = 600;
+
+              sf::RenderWindow window(sf::VideoMode(display_size, display_size),
+                                      "SIR model");
+
+              epidemic_SIR::Display_graph display{window, display_size};
+
+              window.clear(sf::Color::White);
+
+              display.draw_axes();
+              display.draw_axes_notches();
+              display.draw_axes_values(data);
+              display.draw_legend();
+
+              if (choice_4 == 1 || choice_4 == 5 || choice_4 == 7 ||
+                  choice_4 == 8) {
+                display.draw_susceptible(data);
+                display.draw_legend_susceptible();
+              }
+
+              if (choice_4 == 2 || choice_4 == 5 || choice_4 == 6 ||
+                  choice_4 == 8) {
+                display.draw_infectious(data);
+                display.draw_legend_infectious();
+              }
+
+              if (choice_4 == 3 || choice_4 == 6 || choice_4 == 7 ||
+                  choice_4 == 8) {
+                display.draw_recovered(data);
+                display.draw_legend_recovered();
+              }
+
+              window.display();
+
+              sf::Event event;
+              while (window.waitEvent(event)) {
+                if (event.type == sf::Event::Closed) window.close();
+              }
+
+            } break;
           }
-        } while (choice_2 != 0);
 
-        std::cout << "To exit press 0, otherwise insert more days to simulate: "
-                  << '\n';
-        days = input_days();
+          std::cout << '\n';
+        } while (choice_3 != 0);
 
-      } while (days != 0);
+        std::cout << "Do you want to simulate more days?" << '\n'
+                  << "1. Yes" << '\n'
+                  << "0. Exit" << '\n';
+
+        choice_2 = input_choice(0, 1);
+      } while (choice_2 != 0);
     } break;
 
     case 2: {
@@ -215,5 +194,5 @@ int main() {
     } break;
   }
 
-  return 0;
+  std::cout << "Goodbye" << '\n';
 }
