@@ -59,11 +59,11 @@ World move(World const& world_to_move, double travel_probability);
 int neighbours(World const& world_to_count, Point const& point,
                Cell const& cell_type);
 
-World spread(World const& world_to_spread);
+World spread(World const& world_to_spread, double probabilty_beta);
 
-World recover(World const& world_to_spread);
+World recover(World const& world_to_recover, double probabilty_gamma);
 
-World evolve(World const& current, int duration);
+World evolve(World const& current, int duration, Parameter const& parameter_to_evolve);
 
 }  // namespace epidemic_SIR
 

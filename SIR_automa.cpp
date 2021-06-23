@@ -2,11 +2,17 @@
 
 namespace epidemic_SIR {
 
-int World::get_side() const { return m_side; }
+int World::get_side() const {
+  return m_side;
+}
 
-std::vector<Cell> World::get_grid() const { return m_grid; }
+std::vector<Cell> World::get_grid() const {
+  return m_grid;
+}
 
-std::vector<Population> World::get_data() const { return m_data; }
+std::vector<Population> World::get_data() const {
+  return m_data;
+}
 
 void World::update_grid(std::vector<Cell> const& grid_to_update) {
   m_grid = grid_to_update;
@@ -28,14 +34,14 @@ int find_index(Point const& point, int side) {
 
 int random_int_generator(int inf, int sup) {
   std::default_random_engine engine{std::random_device{}()};
-  std::uniform_int_distribution<> uniform_distribution{inf, sup};
+  std::uniform_int_distribution<int> uniform_distribution{inf, sup};
   return uniform_distribution(engine);
 }
 
 double random_real_generator(double inf, double sup) {
   std::default_random_engine engine{std::random_device{}()};
-  std::uniform_real_distribution<> uniform_distribution{inf, sup};
-  return uniform_distribution(engine);
+  std::uniform_real_distribution<double> real_distribution{inf, sup};
+  return real_distribution(engine);
 }
 
 bool probability(double probability) {
@@ -43,8 +49,7 @@ bool probability(double probability) {
   return (random_number < probability);
 }
 
-World generate(World const& world_to_generate, int number_of_people,
-               Cell const& cell_type) {
+World generate(World const& world_to_generate, int number_of_people, Cell const& cell_type) {
   World world = world_to_generate;
   std::vector<Cell> grid = world.get_grid();
   int const side = world.get_side();
@@ -73,9 +78,9 @@ World update_data(World const& world_to_update_data) {
   std::vector<Population> data = world.get_data();
   int const side = world.get_side();
 
-  int susceptible_count = 0;
-  int infectious_count = 0;
-  int recovered_count = 0;
+  double susceptible_count = 0;
+  double infectious_count = 0;
+  double recovered_count = 0;
 
   for (int row = 0; row != side; ++row) {
     for (int column = 0; column != side; ++column) {
@@ -98,34 +103,13 @@ World update_data(World const& world_to_update_data) {
 }
 
 Point find_direction(Point const& point_to_move) {
-  int random_direction = random_int_generator(0, 7);
+  int random_direction_x = random_int_generator(-1, 1);
+  int random_direction_y = random_int_generator(-1, 1);
   Point point = point_to_move;
 
-  if (random_direction == 0) {
-    point.row = point.row - 1;
-    point.column = point.column - 1;
-  } else if (random_direction == 1) {
-    point.row = point.row;
-    point.column = point.column - 1;
-  } else if (random_direction == 2) {
-    point.row = point.row + 1;
-    point.column = point.column - 1;
-  } else if (random_direction == 3) {
-    point.row = point.row - 1;
-    point.column = point.column;
-  } else if (random_direction == 4) {
-    point.row = point.row + 1;
-    point.column = point.column;
-  } else if (random_direction == 5) {
-    point.row = point.row - 1;
-    point.column = point.column + 1;
-  } else if (random_direction == 6) {
-    point.row = point.row;
-    point.column = point.column + 1;
-  } else if (random_direction == 7) {
-    point.row = point.row + 1;
-    point.column = point.column + 1;
-  }
+  point.row = point.row + random_direction_x;
+  point.column = point.column + random_direction_y;
+
   return point;
 }
 
@@ -139,8 +123,7 @@ World move(World const& world_to_move, double travel_probability) {
       Point const point{row, column};
       int const index = find_index(point, side);
 
-      if (grid[index] != Cell::Empty &&
-          (probability(travel_probability) == true)) {
+      if (grid[index] != Cell::Empty && (probability(travel_probability) == true)) {
         Point const new_point = find_direction(point);
         int const new_index = find_index(new_point, side);
 
@@ -156,14 +139,11 @@ World move(World const& world_to_move, double travel_probability) {
   return world;
 }
 
-int neighbours(World const& world_to_count, Point const& point,
-               Cell const& cell_type) {
+int neighbours(World const& world_to_count, Point const& point, Cell const& cell_type) {
   World world = world_to_count;
   std::vector<Cell> grid = world.get_grid();
   int const side = world.get_side();
-
   int count = 0;
-
   int const index = find_index(point, side);
 
   if (grid[index] == cell_type) {
@@ -182,7 +162,7 @@ int neighbours(World const& world_to_count, Point const& point,
   return count;
 }
 
-World spread(World const& world_to_spread) {
+World spread(World const& world_to_spread, double probability_to_spread) {
   World world = world_to_spread;
   std::vector<Cell> grid = world.get_grid();
   int const side = world.get_side();
@@ -196,7 +176,7 @@ World spread(World const& world_to_spread) {
       if (grid[index] == Cell::Susceptible) {
         int const c = neighbours(world, point, Cell::Infectious);
 
-        if ((probability(0.4 * c) == true) && c > 0) {
+        if ((probability(probability_to_spread * c) == true) && c > 0) {
           next_grid[index] = Cell::Infectious;
         }
       }
@@ -207,8 +187,8 @@ World spread(World const& world_to_spread) {
   return world;
 }
 
-World recover(World const& world_to_spread) {
-  World world = world_to_spread;
+World recover(World const& world_to_recover, double probability_gamma) {
+  World world = world_to_recover;
   std::vector<Cell> grid = world.get_grid();
   int const side = world.get_side();
 
@@ -218,7 +198,7 @@ World recover(World const& world_to_spread) {
     for (int column = 0; column != side; column++) {
       Point const point{row, column};
       int const index = find_index(point, side);
-      if (grid[index] == Cell::Infectious && (probability(0.04 / 24) == true)) {
+      if (grid[index] == Cell::Infectious && (probability(probability_gamma / 24) == true)) {
         next_grid[index] = Cell::Recovered;
       }
     }
@@ -228,12 +208,13 @@ World recover(World const& world_to_spread) {
   return world;
 }
 
-World evolve(World const& current, int duration) {
+World evolve(World const& current, int duration, Parameter const& parameter_to_evolve) {
+  Parameter parameter = parameter_to_evolve;
   World next = current;
 
-  next = spread(next);
+  next = spread(next, parameter.beta);
 
-  next = recover(next);
+  next = recover(next, parameter.gamma);
 
   if ((duration % 24) > 6 && (duration % 24) < 22) {
     next = move(next, 0.5);

@@ -6,10 +6,11 @@ void Virus::add_data(Population const& data_to_add) {
   m_data.push_back(data_to_add);
 }
 
-std::vector<Population> Virus::get_data() { return m_data; }
+std::vector<Population> Virus::get_data() const{
+  return m_data;
+}
 
-Virus evolve(Virus const& virus_to_evolve, Parameter const& parameter,
-             double duration) {
+Virus evolve(Virus const& virus_to_evolve, Parameter const& parameter, double duration) {
   Virus virus = virus_to_evolve;
   std::vector<Population> data = virus.get_data();
 
@@ -30,13 +31,40 @@ Virus evolve(Virus const& virus_to_evolve, Parameter const& parameter,
     population.r = population.r + delta_r;
 
     assert(population.s >= 0 && population.i >= 0 && population.r >= 0);
-    assert(std::round(N) ==
-           std::round(population.s + population.i + population.r));
+    assert(std::round(N) == std::round(population.s + population.i + population.r));
 
     virus.add_data(population);
   }
 
   return virus;
+}
+
+void print(std::vector<Population> const& data_to_print, Parameter const& parameter) {
+  std::vector<Population> data = data_to_print;
+
+  int const width = 8;
+
+  std::cout << "R0: " << parameter.beta / parameter.gamma << '\n';
+
+  std::cout << std::setw(width) << "Day" << '\t'  //
+            << std::setw(width) << 'S' << '\t'    //
+            << std::setw(width) << 'I' << '\t'    //
+            << std::setw(width) << 'R' << '\t'    //
+            << std::setw(width) << 'N' << '\n';
+
+  int const size = static_cast<int>(data.size());
+
+  for (int i = 0; i != size; ++i) {
+    Population const population = data[i];
+
+    double const N = population.s + population.i + population.r;
+
+    std::cout << std::setw(width) << i << '\t'             //
+              << std::setw(width) << population.s << '\t'  //
+              << std::setw(width) << population.i << '\t'  //
+              << std::setw(width) << population.r << '\t'  //
+              << std::setw(width) << N << '\n';
+  }
 }
 
 std::vector<Population> round_off(std::vector<Population> const& data_to_round_off) {
@@ -97,39 +125,8 @@ std::vector<Population> round_off(std::vector<Population> const& data_to_round_o
   return data;
 }
 
-void print(Virus const& virus_to_print, Parameter const& parameter) {
-  Virus virus = virus_to_print;
-  std::vector<Population> data = virus.get_data();
-
-  int const width = 8;
-
-  std::cout << "R0: " << parameter.beta / parameter.gamma << '\n';
-
-  std::cout << std::setw(width) << "Day" << '\t'  //
-            << std::setw(width) << 'S' << '\t'    //
-            << std::setw(width) << 'I' << '\t'    //
-            << std::setw(width) << 'R' << '\t'    //
-            << std::setw(width) << 'N' << '\n';
-
-  int const size = static_cast<int>(data.size());
-
-  for (int i = 0; i != size; ++i) {
-    Population const population = data[i];
-
-    double const N = population.s + population.i + population.r;
-
-    std::cout << std::setw(width) << i << '\t'             //
-              << std::setw(width) << population.s << '\t'  //
-              << std::setw(width) << population.i << '\t'  //
-              << std::setw(width) << population.r << '\t'  //
-              << std::setw(width) << N << '\n';
-  }
-}
-
-void print_round_off(Virus const& virus_to_print,
-                       Parameter const& parameter) {
-  Virus virus = virus_to_print;
-  std::vector<Population> data = virus.get_data();
+void print_round_off(std::vector<Population> const& data_to_print, Parameter const& parameter) {
+  std::vector<Population> data_round_off = round_off(data_to_print);
 
   int const width = 8;
 
@@ -141,12 +138,10 @@ void print_round_off(Virus const& virus_to_print,
             << std::setw(width) << 'R' << '\t'    //
             << std::setw(width) << 'N' << '\n';
 
-  int const size = static_cast<int>(data.size());
-
-  std::vector<Population> data_round = round_off(data);
+  int const size = static_cast<int>(data_round_off.size());
 
   for (int i = 0; i != size; ++i) {
-    Population const population = data_round[i];
+    Population const population = data_round_off[i];
 
     double const N = population.s + population.i + population.r;
 

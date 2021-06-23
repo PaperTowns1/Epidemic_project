@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <vector>
@@ -27,24 +28,22 @@ class Virus {
   std::vector<Population> m_data;
 
  public:
-  Virus(Population const& initial_population)
-      : m_initial_population{initial_population} {
+  Virus(Population const& initial_population) : m_initial_population{initial_population} {
     m_data.push_back(m_initial_population);
   }
 
-  std::vector<Population> get_data();
+  std::vector<Population> get_data() const;
 
   void add_data(Population const& data_to_add);
 };
 
-Virus evolve(Virus const& virus_to_evolve, Parameter const& parameter,
-             double duration);
+Virus evolve(Virus const& virus_to_evolve, Parameter const& parameter, double duration);
 
-void print(Virus const& virus_to_print, Parameter const& parameter);
+void print(std::vector<Population> const& data_to_print, Parameter const& parameter);
 
 std::vector<Population> round_off(std::vector<Population> const& data_to_round_off);
 
-void print_round_off(Virus const& virus_to_print, Parameter const& parameter);
+void print_round_off(std::vector<Population> const& data_to_print, Parameter const& parameter);
 
 }  // namespace epidemic_SIR
 

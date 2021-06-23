@@ -3,8 +3,8 @@
 
 #include <cassert>
 #include <cmath>
+#include <exception>
 #include <iostream>
-#include <limits>
 
 #include "SIR.hpp"
 
@@ -16,7 +16,7 @@ namespace epidemic_SIR {
 
 Population input_initial_population();
 
-Parameter input_parameter();
+Parameter input_parameters();
 
 }  // namespace epidemic_SIR
 

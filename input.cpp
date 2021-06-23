@@ -7,8 +7,7 @@ int input_choice(int inf, int sup) {
   std::cin >> choice;
   std::cout << '\n';
 
-  if (std::cin.fail() || choice < inf || choice > sup ||
-      choice - std::floor(choice) != 0) {
+  if (std::cin.fail() || choice < inf || choice > sup || choice - std::floor(choice) != 0) {
     throw std::runtime_error{"Invalid choice input"};
   }
 
@@ -36,7 +35,6 @@ Population input_initial_population() {
 
   std::cout << "Susceptible: ";
   std::cin >> initial_population.s;
-  std::cout << '\n';
 
   if (std::cin.fail() || initial_population.s < 0 ||
       initial_population.s - std::floor(initial_population.s) != 0) {
@@ -45,31 +43,30 @@ Population input_initial_population() {
 
   std::cout << "Infectious: ";
   std::cin >> initial_population.i;
-  std::cout << '\n';
 
-  if (std::cin.fail() || initial_population.i < 0 ||
+  if (std::cin.fail() || initial_population.i < 1 ||
       initial_population.i - std::floor(initial_population.i) != 0) {
     throw std::runtime_error{"Invalid infectious input"};
   }
 
   std::cout << "Recovered: ";
   std::cin >> initial_population.r;
-  std::cout << '\n';
 
   if (std::cin.fail() || initial_population.r < 0 ||
       initial_population.r - std::floor(initial_population.r) != 0) {
     throw std::runtime_error{"Invalid recovered input"};
   }
 
+  std::cout << '\n';
+
   return initial_population;
 }
 
-Parameter input_parameter() {
+Parameter input_parameters() {
   epidemic_SIR::Parameter parameter{};
 
   std::cout << "Beta: ";
   std::cin >> parameter.beta;
-  std::cout << '\n';
 
   if (std::cin.fail() || parameter.beta < 0 || parameter.beta > 1) {
     throw std::runtime_error{"Invalid beta input"};
@@ -77,15 +74,16 @@ Parameter input_parameter() {
 
   std::cout << "Gamma: ";
   std::cin >> parameter.gamma;
-  std::cout << '\n';
 
   if (std::cin.fail() || parameter.gamma < 0 || parameter.gamma > 1) {
     throw std::runtime_error{"Invalid gamma input"};
   }
 
   if (parameter.beta / parameter.gamma < 1) {
-    throw std::runtime_error{"R0 is less than 1, epidemic will not start"};
+    throw std::runtime_error{"Invalid R0 input (R0 is less than 1, epidemic will not start)"};
   }
+
+  std::cout << '\n';
 
   return parameter;
 }

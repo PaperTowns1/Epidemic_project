@@ -12,11 +12,11 @@ namespace epidemic_SIR {
 class Display_graph {
   sf::RenderWindow& m_window;
   sf::Font m_font;
-  int m_display_size;
+  int m_display_side;
 
  public:
-  Display_graph(sf::RenderWindow& window, int display_size)
-      : m_window{window}, m_display_size{display_size} {
+  Display_graph(sf::RenderWindow& window, int display_side)
+      : m_window{window}, m_display_side{display_side} {
     if (m_font.loadFromFile("Roboto.ttf") == false) {
       throw std::runtime_error{"cannot load font"};
     }
@@ -26,11 +26,11 @@ class Display_graph {
 
   void draw_axes_notches();
 
+  int count_digits(int n);
+
   void draw_axes_values(std::vector<Population> const& data);
 
   void draw_legend();
-
-  int count_digits(int n);
 
   sf::Transform transform();
 
