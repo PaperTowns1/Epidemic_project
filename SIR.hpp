@@ -1,12 +1,8 @@
 #ifndef SIR_HPP
 #define SIR_HPP
 
-#include <algorithm>
 #include <cassert>
 #include <cmath>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
 #include <vector>
 
 namespace epidemic_SIR {
@@ -34,16 +30,10 @@ class Virus {
 
   std::vector<Population> get_data() const;
 
-  void add_data(Population const& data_to_add);
+  void update_data(Population const& data_to_add);
 };
 
 Virus evolve(Virus const& virus_to_evolve, Parameter const& parameter, double duration);
-
-void print(std::vector<Population> const& data_to_print, Parameter const& parameter);
-
-std::vector<Population> round_off(std::vector<Population> const& data_to_round_off);
-
-void print_round_off(std::vector<Population> const& data_to_print, Parameter const& parameter);
 
 }  // namespace epidemic_SIR
 

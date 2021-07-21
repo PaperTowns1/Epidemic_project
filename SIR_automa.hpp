@@ -9,9 +9,19 @@
 #include <random>
 #include <vector>
 
-#include "SIR.hpp"
+namespace epidemic_SIR_CA {
 
-namespace epidemic_SIR {
+struct Population {
+  double s;
+  double i;
+  double r;
+};
+
+struct Parameter {
+  double beta;
+  double gamma;
+  double alpha;
+};
 
 enum class Cell : char { Empty, Susceptible, Infectious, Recovered };
 
@@ -26,7 +36,8 @@ class World {
   std::vector<Population> m_data;
 
  public:
-  World(int n) : m_side(n), m_grid(m_side * m_side, Cell::Empty), m_data() {}
+  World(int n) : m_side(n), m_grid(m_side * m_side, Cell::Empty), m_data() {
+  }
 
   int get_side() const;
 
@@ -34,7 +45,7 @@ class World {
 
   std::vector<Population> get_data() const;
 
-  void update_grid(std::vector<Cell> const& grid_to_update);
+  void add_grid(std::vector<Cell> const& grid_to_add);
 
   void add_data(Population const& data_to_add);
 };
@@ -43,28 +54,22 @@ int find_index(Point const& point, int side);
 
 int random_int_generator(int inf, int sup);
 
-double random_real_generator(double inf, double sup);
-
 bool probability(double probability);
 
-World generate(World const& world_to_generate, int number_of_people,
-               Cell const& cell_type);
-
 World update_data(World const& world_to_update_data);
+
+World generate(World const& world_to_generate, int number_of_people, Cell const& cell_type);
 
 Point find_direction(Point const& point_to_move);
 
 World move(World const& world_to_move, double travel_probability);
 
-int neighbours(World const& world_to_count, Point const& point,
-               Cell const& cell_type);
+int neighbours(World const& world_to_count, Point const& point, Cell const& cell_type);
 
-World spread(World const& world_to_spread, double probabilty_beta);
+World evolve_grid(World const& world_to_evolve, Parameter const& parameter);
 
-World recover(World const& world_to_recover, double probabilty_gamma);
+World evolve(World const& world_to_evolve, Parameter const& parameter_to_evolve);
 
-World evolve(World const& current, int duration, Parameter const& parameter_to_evolve);
-
-}  // namespace epidemic_SIR
+}  // namespace epidemic_SIR_CA
 
 #endif

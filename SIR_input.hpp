@@ -1,12 +1,12 @@
-#ifndef INPUT_HPP
-#define INPUT_HPP
+#ifndef SIR_INPUT_HPP
+#define SIR_INPUT_HPP
 
 #include <cassert>
 #include <cmath>
-#include <exception>
 #include <iostream>
 
 #include "SIR.hpp"
+#include "SIR_automa.hpp"
 
 int input_choice(int inf, int sup);
 
@@ -19,5 +19,13 @@ Population input_initial_population();
 Parameter input_parameters();
 
 }  // namespace epidemic_SIR
+
+namespace epidemic_SIR_CA {
+
+Population input_initial_population(int grid_side);
+
+Parameter input_parameters();
+
+}  // namespace epidemic_SIR_CA
 
 #endif

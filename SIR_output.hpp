@@ -1,50 +1,48 @@
-#ifndef SIR_DISPLAY_HPP
-#define SIR_DISPLAY_HPP
+#ifndef SIR_OUTPUT_HPP
+#define SIR_OUTPUT_HPP
 
 #include <SFML/Graphics.hpp>
+#include <algorithm>
 #include <cmath>
-#include <string>
+#include <iomanip>
+#include <iostream>
 
 #include "SIR.hpp"
 
 namespace epidemic_SIR {
 
-class Display_graph {
+void print(std::vector<Population> const& data_to_print, Parameter const& parameter);
+
+std::vector<Population> round_off(std::vector<Population> const& data_to_round_off);
+
+void print_round_off(std::vector<Population> const& data_to_print, Parameter const& parameter);
+
+class Graph_display {
   sf::RenderWindow& m_window;
   sf::Font m_font;
   int m_display_side;
 
  public:
-  Display_graph(sf::RenderWindow& window, int display_side)
+  Graph_display(sf::RenderWindow& window, int display_side)
       : m_window{window}, m_display_side{display_side} {
     if (m_font.loadFromFile("Roboto.ttf") == false) {
       throw std::runtime_error{"cannot load font"};
     }
   }
 
-  void draw_axes();
-
-  void draw_axes_notches();
-
   int count_digits(int n);
 
-  void draw_axes_values(std::vector<Population> const& data);
+  void draw_axes(std::vector<Population> const& data);
 
-  void draw_legend();
+  void draw_legend(std::vector<Population> const& data_to_print);
 
   sf::Transform transform();
 
   void draw_susceptible(std::vector<Population> const& data);
 
-  void draw_legend_susceptible();
-
   void draw_infectious(std::vector<Population> const& data);
 
-  void draw_legend_infectious();
-
   void draw_recovered(std::vector<Population> const& data);
-
-  void draw_legend_recovered();
 };
 
 }  // namespace epidemic_SIR

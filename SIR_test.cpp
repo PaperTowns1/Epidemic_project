@@ -1,19 +1,23 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "SIR.hpp"
 
+#include "SIR_automa.hpp"
+#include "SIR_output.hpp"
 #include "doctest.h"
 
+namespace epidemic_SIR {
+
 TEST_CASE("Testing SIR model (equations) 1: simulate first 5 days") {
-  epidemic_SIR::Population initial_population{997, 3, 0};
-  epidemic_SIR::Parameter parameter{0.4, 0.04};
+  Population initial_population{997, 3, 0};
+  Parameter parameter{0.4, 0.04};
 
   int days = 5;
 
-  epidemic_SIR::Virus covid{initial_population};
+  Virus covid{initial_population};
 
-  covid = epidemic_SIR::evolve(covid, parameter, days);
+  covid = evolve(covid, parameter, days);
 
-  std::vector<epidemic_SIR::Population> data = covid.get_data();
+  std::vector<Population> data = covid.get_data();
 
   CHECK(data[0].s == 997.);
   CHECK(data[0].i == 3.);
@@ -39,7 +43,7 @@ TEST_CASE("Testing SIR model (equations) 1: simulate first 5 days") {
   CHECK(data[5].i == doctest::Approx(13.83).epsilon(0.01));
   CHECK(data[5].r == doctest::Approx(1.21).epsilon(0.01));
 
-  std::vector<epidemic_SIR::Population> data_round = round_off(data);
+  auto data_round = round_off(data);
 
   CHECK(data_round[0].s == 997);
   CHECK(data_round[0].i == 3);
@@ -67,16 +71,16 @@ TEST_CASE("Testing SIR model (equations) 1: simulate first 5 days") {
 }
 
 TEST_CASE("Testing SIR model (equations) 2: changing initial conditions") {
-  epidemic_SIR::Population initial_population{499, 1, 0};
-  epidemic_SIR::Parameter parameter{0.21, 0.01};
+  Population initial_population{499, 1, 0};
+  Parameter parameter{0.21, 0.01};
 
   int days = 5;
 
-  epidemic_SIR::Virus covid{initial_population};
+  Virus covid{initial_population};
 
-  covid = epidemic_SIR::evolve(covid, parameter, days);
+  covid = evolve(covid, parameter, days);
 
-  std::vector<epidemic_SIR::Population> data = covid.get_data();
+  auto data = covid.get_data();
 
   CHECK(data[0].s == 499.);
   CHECK(data[0].i == 1.);
@@ -102,7 +106,7 @@ TEST_CASE("Testing SIR model (equations) 2: changing initial conditions") {
   CHECK(data[5].i == doctest::Approx(2.48).epsilon(0.01));
   CHECK(data[5].r == doctest::Approx(0.07).epsilon(0.01));
 
-  std::vector<epidemic_SIR::Population> data_round = round_off(data);
+  auto data_round = round_off(data);
 
   CHECK(data_round[0].s == 499);
   CHECK(data_round[0].i == 1);
@@ -130,17 +134,17 @@ TEST_CASE("Testing SIR model (equations) 2: changing initial conditions") {
 }
 
 TEST_CASE("Testing SIR model (equations) 3: adding more days") {
-  epidemic_SIR::Population initial_population{9997, 3, 0};
-  epidemic_SIR::Parameter parameter{0.3654, 0.0954};
+  Population initial_population{9997, 3, 0};
+  Parameter parameter{0.3654, 0.0954};
 
   int days = 25;
 
   epidemic_SIR::Virus covid{initial_population};
 
-  covid = epidemic_SIR::evolve(covid, parameter, days);
-  covid = epidemic_SIR::evolve(covid, parameter, days);
+  covid = evolve(covid, parameter, days);
+  covid = evolve(covid, parameter, days);
 
-  std::vector<epidemic_SIR::Population> data = covid.get_data();
+  auto data = covid.get_data();
 
   CHECK(data[25].s == doctest::Approx(8606.69).epsilon(0.01));
   CHECK(data[25].i == doctest::Approx(1005.68).epsilon(0.01));
@@ -154,7 +158,7 @@ TEST_CASE("Testing SIR model (equations) 3: adding more days") {
   CHECK(data[50].i == doctest::Approx(2079.95).epsilon(0.01));
   CHECK(data[50].r == doctest::Approx(7433.49).epsilon(0.01));
 
-  std::vector<epidemic_SIR::Population> data_round = round_off(data);
+  auto data_round = round_off(data);
 
   CHECK(data_round[25].s == 8607);
   CHECK(data_round[25].i == 1005);
@@ -168,3 +172,53 @@ TEST_CASE("Testing SIR model (equations) 3: adding more days") {
   CHECK(data_round[50].i == 2080);
   CHECK(data_round[50].r == 7433);
 }
+
+}  // namespace epidemic_SIR
+
+namespace epidemic_SIR_CA {
+
+TEST_CASE("Testing SIR model (automata) 1: neighbour") {
+  World world(5);
+  auto grid = world.get_grid();
+
+  int const index_s = find_index({0, 0}, 5);
+  int const index_i_1 = find_index({0, 4}, 5);
+  grid[index_s] = Cell::Susceptible;
+  grid[index_i_1] = Cell::Infectious;
+
+  world.add_grid(grid);
+
+  int const c_1 = neighbours(world, {0, 0}, Cell::Infectious);
+
+  CHECK(c_1 == 1);
+
+  int const index_i_2 = find_index({0, 1}, 5);
+  grid[index_i_2] = Cell::Infectious;
+
+  world.add_grid(grid);
+
+  int const c_2 = neighbours(world, {0, 0}, Cell::Infectious);
+
+  CHECK(c_2 == 2);
+}
+
+TEST_CASE("Testing SIR model (automata) 2: spread and recover") {
+  World world(5);
+  auto grid = world.get_grid();
+
+  grid[find_index({2, 2}, 5)] = Cell::Susceptible;
+  grid[find_index({3, 2}, 5)] = Cell::Infectious;
+  world.add_grid(grid);
+
+  world = evolve_grid(world, {1, 0, 0});
+  auto grid_1 = world.get_grid();
+
+  CHECK(grid_1[find_index({2, 2}, 5)] == Cell::Infectious);
+
+  world = evolve_grid(world, {0, 1, 0});
+  auto grid_2 = world.get_grid();
+
+  CHECK(grid_2[find_index({2, 2}, 5)] == Cell::Recovered);
+}
+
+}  // namespace epidemic_SIR_CA
